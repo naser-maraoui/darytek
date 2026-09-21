@@ -10,7 +10,7 @@ const montserrat = Montserrat({
   weight: ["400", "500", "600", "700", "800", "900"],
 });
 
-// Use env var on Vercel, fallback to localhost for dev
+// Robust fallback chain for the site URL
 function resolveSiteUrl(): string {
   const explicit = process.env.NEXT_PUBLIC_SITE_URL?.trim();
   if (explicit) return explicit;
@@ -25,10 +25,10 @@ function resolveSiteUrl(): string {
 }
 
 const siteUrl = resolveSiteUrl();
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
 
-  // ── Basic ────────────────────────────────────────
   title: {
     default: "Darytek — Votre boutique d'électroménager et accessoires",
     template: "%s | Darytek",
@@ -51,9 +51,6 @@ export const metadata: Metadata = {
   creator: "Darytek",
   publisher: "Darytek",
 
- 
-
-  // ── Open Graph (WhatsApp / Facebook link previews) ──
   openGraph: {
     type: "website",
     locale: "fr_TN",
@@ -72,7 +69,6 @@ export const metadata: Metadata = {
     ],
   },
 
-  // ── Twitter ──────────────────────────────────────
   twitter: {
     card: "summary_large_image",
     title: "Darytek — Électroménager en Tunisie",
@@ -81,7 +77,6 @@ export const metadata: Metadata = {
     images: ["/logo.png"],
   },
 
-  // ── SEO ──────────────────────────────────────────
   robots: {
     index: true,
     follow: true,

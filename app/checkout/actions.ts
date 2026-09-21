@@ -19,17 +19,10 @@ type CheckoutData = {
 export async function createOrder(data: CheckoutData) {
   const supabase = await createClient();
 
-  // Check authentication
+  // Get current user if any (guests allowed — customer_id will be null)
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  if (!user) {
-    return {
-      success: false,
-      error: "Vous devez être connecté pour passer une commande.",
-    };
-  }
 
   // Validate customer information
   if (!data.customerName.trim()) {
@@ -123,11 +116,11 @@ export async function createOrder(data: CheckoutData) {
     });
   }
 
-  // Create order
+  // Create order — customer_id is null for guest checkout
   const { data: order, error: orderError } = await supabase
     .from("orders")
     .insert({
-      customer_id: user.id,
+      customer_id: user?.id ?? null,
       customer_name: data.customerName.trim(),
       customer_phone: data.customerPhone.trim(),
       customer_address: data.customerAddress.trim(),
@@ -180,4 +173,3 @@ export async function createOrder(data: CheckoutData) {
     orderId: order.id,
   };
 }
-

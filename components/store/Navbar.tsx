@@ -108,10 +108,32 @@ export default function Navbar({ categories }: { categories: Category[] }) {
   const whatsapp = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "";
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 30);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  // Only run the scroll-based shrink on screens wider than mobile.
+  // On phones, keeping the navbar fixed avoids the scroll lag entirely.
+  const isDesktop = () => window.matchMedia("(min-width: 768px)").matches;
+
+  let ticking = false;
+  let lastScrolled = false;
+
+  const update = () => {
+    ticking = false;
+    const next = isDesktop() && window.scrollY > 30;
+    if (next !== lastScrolled) {
+      lastScrolled = next;
+      setScrolled(next);
+    }
+  };
+
+  const onScroll = () => {
+    if (!ticking) {
+      ticking = true;
+      window.requestAnimationFrame(update);
+    }
+  };
+
+  window.addEventListener("scroll", onScroll, { passive: true });
+  return () => window.removeEventListener("scroll", onScroll);
+}, []);
 
   // Close the mega menu when clicking outside
   useEffect(() => {
